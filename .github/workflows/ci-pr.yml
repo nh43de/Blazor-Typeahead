@@ -3,6 +3,7 @@ name: Build & Test PR
 on:
   pull_request:
     branches: [ main ]
+  workflow_dispatch:  # Allow manual triggering
 
 env:
     PROJECT_NAME: Blazored.Typeahead

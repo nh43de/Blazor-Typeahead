@@ -6,6 +6,7 @@ on:
     tags: ['v*']
   release:
     types: [published]
+  workflow_dispatch:  # Allow manual triggering
 
 env:
   NETCORE_VERSION: "9.0.x"
