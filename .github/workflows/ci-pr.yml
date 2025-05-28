@@ -6,17 +6,17 @@ on:
 
 env:
     PROJECT_NAME: Blazored.Typeahead
-    NETCORE_VERSION: '6.0.x'
+    NETCORE_VERSION: '9.0.x'
 
 jobs:
   build:
     name: Build and test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Setting up .NET Core SDK ${{ env.NETCORE_VERSION }}...
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.NETCORE_VERSION }}
 
