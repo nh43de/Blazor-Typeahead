@@ -2,8 +2,8 @@
 
 var onOutsideClickFunctions = {};
 
-window.blazoredTypeahead = {
-    assemblyname: "Blazored.Typeahead",
+window.modernBlazorTypeahead = {
+    assemblyname: "ModernBlazor.Typeahead",
     setFocus: function (element) {
         if (element && element.focus) element.focus();
     },
@@ -56,7 +56,7 @@ window.blazoredTypeahead = {
             }
         }
 
-        blazoredTypeahead.onOutsideClickClear(searchTextElement); //clean up just in case
+        modernBlazorTypeahead.onOutsideClickClear(searchTextElement); //clean up just in case
 
         var func = function(e) {
             var parent = e.target;
@@ -72,7 +72,7 @@ window.blazoredTypeahead = {
 
             dotnetRef.invokeMethodAsync(methodName);
             if (clearOnFire) { //could also add a check to see if the search element is missing on the DOM to force cleaning up the function?
-                blazoredTypeahead.onOutsideClickClear(searchTextElement);
+                modernBlazorTypeahead.onOutsideClickClear(searchTextElement);
             }
         };
         onOutsideClickFunctions[bId] = func; //save a reference to the click function
