@@ -1,12 +1,11 @@
-using System.Diagnostics;
+using System.Linq.Expressions;
+using System.Timers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
-using System.Linq.Expressions;
-using System.Timers;
 
-namespace Blazored.Typeahead
+namespace ModernBlazor.Typeahead
 {
     public partial class BlazoredTypeahead<TItem, TValue> : ComponentBase, IDisposable
     {
