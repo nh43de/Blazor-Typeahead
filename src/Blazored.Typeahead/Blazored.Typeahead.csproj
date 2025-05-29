@@ -5,21 +5,21 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
-    <Authors>Chris Sainty</Authors>
+    <Authors>nh43de</Authors>
     <Company></Company>
-    <Copyright>Copyright 2020 (c) Chris Sainty. All rights reserved.</Copyright> 
-    <Description>A typeahead component for Blazor applications</Description>
+    <Copyright>Copyright 2025 (c) nh43de. All rights reserved. Based on original work by Chris Sainty.</Copyright> 
+    <Description>A typeahead component for Blazor applications (.NET 9 fork with MinVer versioning)</Description>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
     <!-- NuGet settings -->
-    <PackageId>Blazored.Typeahead</PackageId>
-    <PackageTags>Blazored;Blazor;Razor;Components;Typeahead;Autocomplete;Auto Complete;ASP.NET Core;CSharp;Web</PackageTags>
+    <PackageId>ModernBlazor.Typeahead</PackageId>
+    <PackageTags>Blazored;Blazor;Razor;Components;Typeahead;Autocomplete;Auto Complete;ASP.NET Core;CSharp;Web;NET9;Fork</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/Blazored/Typeahead</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/nh43de/Blazor-Typeahead</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/Blazored/Typeahead</RepositoryUrl>
+    <RepositoryUrl>https://github.com/nh43de/Blazor-Typeahead</RepositoryUrl>
 
     <!-- SourceLink settings -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

@@ -1,17 +1,31 @@
-# Blazored Typeahead
+# nh43de Typeahead (.NET 9 Fork)
+
+**Fork of [Blazored.Typeahead](https://github.com/Blazored/Typeahead) updated for .NET 9 with MinVer versioning**
+
 Typeahead control for Blazor applications.
 
-[![Nuget version](https://img.shields.io/nuget/v/Blazored.Typeahead.svg?logo=nuget)](https://www.nuget.org/packages/Blazored.Typeahead/)
-[![Nuget downloads](https://img.shields.io/nuget/dt/Blazored.Typeahead?logo=nuget)](https://www.nuget.org/packages/Blazored.Typeahead/)
-![Build & Test Main](https://github.com/Blazored/Typeahead/workflows/Build%20&%20Test%20Main/badge.svg)
+[![Nuget version](https://img.shields.io/nuget/v/ModernBlazor.Typeahead.svg?logo=nuget)](https://www.nuget.org/packages/nh43de.Typeahead/)
+[![Nuget downloads](https://img.shields.io/nuget/dt/ModernBlazor.Typeahead?logo=nuget)](https://www.nuget.org/packages/nh43de.Typeahead/)
+![Build & Test Main](https://github.com/nh43de/Blazor-Typeahead/workflows/Build%20&%20Test%20Main/badge.svg)
 
 ![Screenshot](screenshot.png)
+
+## ✨ This Fork's Features
+
+- **.NET 9 Support**: Updated to use .NET 9.0
+- **MinVer Versioning**: Automatic semantic versioning based on Git tags
+- **Modern CI/CD**: Updated GitHub Actions workflows
+- **Pre-release Support**: Automatic pre-release packages for non-tagged commits
+
+## Original Credit
+
+This is a fork of the excellent [Blazored.Typeahead](https://github.com/Blazored/Typeahead) by Chris Sainty. All credit for the original implementation goes to him and the Blazored team.
 
 ### Installing
 
 You can install from NuGet using the following command:
 
-`Install-Package Blazored.Typeahead`
+`Install-Package ModernBlazor.Typeahead`
 
 Or via the Visual Studio package manger.
 
@@ -23,19 +37,19 @@ Blazor Client applications will need to include the following CSS and JS files i
 In the `head` tag add the following CSS.
 
 ```html
-<link href="_content/Blazored.Typeahead/blazored-typeahead.css" rel="stylesheet" />
+<link href="_content/ModernBlazor.Typeahead/blazored-typeahead.css" rel="stylesheet" />
 ```
 
 Then add the JS script at the bottom of the page using the following script tag.
 
 ```html
-<script src="_content/Blazored.Typeahead/blazored-typeahead.js"></script>
+<script src="_content/ModernBlazor.Typeahead/blazored-typeahead.js"></script>
 ```
 
 I would also suggest adding the following using statement to your main `_Imports.razor` to make referencing the component a bit easier.
 
 ```cs
-@using Blazored.Typeahead
+@using ModernBlazor.Typeahead
 ```
 
 ## Usage
