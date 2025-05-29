@@ -189,6 +189,31 @@
     <hr />
 }
 
+<h1>Blazored Typeahead - With Cancellation Token (Simulated Remote Search)</h1>
+
+<p><strong>Instructions:</strong> Type quickly in the field below. Each search takes 2 seconds to complete. 
+If you type again before the 2 seconds are up, the previous search will be cancelled. 
+Try typing "Mar" then quickly change to "Cha" to see cancellation in action!</p>
+
+<BlazoredTypeahead SearchMethodWithCancellation="GetPeopleWithSimulatedDelay"
+                   @bind-Value="SelectedPersonWithCancellation"
+                   placeholder="Search by first name (simulates 2 second delay)...">
+    <SelectedTemplate Context="person">
+        @person.Firstname
+    </SelectedTemplate>
+    <ResultTemplate Context="person">
+        @person.Firstname @person.Lastname
+    </ResultTemplate>
+</BlazoredTypeahead>
+
+<hr />
+
+@if (SelectedPersonWithCancellation != null)
+{
+    <p>Selected with Cancellation: @SelectedPersonWithCancellation.Firstname @SelectedPersonWithCancellation.Lastname</p>
+}
+<p><strong>Type quickly to test cancellation - previous requests will be automatically cancelled!</strong></p>
+
 @code {
 
     private bool IsDisabled = true;
@@ -199,6 +224,7 @@
     private Person SelectedPerson;
     private Person SelectedPersonNull;
     private int? SelectedPersonId;
+    private Person SelectedPersonWithCancellation;
     private IList<Person> SelectedPeople;
     private IList<Person> SelectedPeopleWithNotFoundTemplate;
     private FormExample FormModel = new FormExample();
@@ -263,6 +289,25 @@
     private async Task<IEnumerable<Person>> GetPeopleLocal(string searchText)
     {
         return await Task.FromResult(People.Where(x => x.Firstname.ToLower().Contains(searchText.ToLower())).ToList());
+    }
+
+    private async Task<IEnumerable<Person>> GetPeopleWithSimulatedDelay(string searchText, CancellationToken cancellationToken)
+    {
+        try
+        {
+            // Simulate a long-running remote API call (2 seconds)
+            await Task.Delay(2000, cancellationToken);
+            
+            // Perform the actual search
+            var results = People.Where(x => x.Firstname.ToLower().Contains(searchText.ToLower())).ToList();
+            
+            return results;
+        }
+        catch (OperationCanceledException)
+        {
+            // Re-throw to let the component handle it
+            throw;
+        }
     }
 
     private void HandleFormSubmit()

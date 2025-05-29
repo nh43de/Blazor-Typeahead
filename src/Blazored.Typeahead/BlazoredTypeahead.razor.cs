@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
@@ -16,6 +17,7 @@ namespace Blazored.Typeahead
         private bool _eventsHookedUp = false;
         private ElementReference _searchInput;
         private ElementReference _mask;
+        private CancellationTokenSource _searchCancellationTokenSource;
 
         [Inject] private IJSRuntime JSRuntime { get; set; }
 
@@ -29,7 +31,8 @@ namespace Blazored.Typeahead
         [Parameter] public EventCallback<IList<TValue>> ValuesChanged { get; set; }
         [Parameter] public Expression<Func<IList<TValue>>> ValuesExpression { get; set; }
 
-        [Parameter] public Func<string, Task<IEnumerable<TItem>>> SearchMethod { get; set; }
+        [Parameter] public Func<string, Task<IEnumerable<TItem>>>? SearchMethod { get; set; }
+        [Parameter] public Func<string, CancellationToken, Task<IEnumerable<TItem>>>? SearchMethodWithCancellation { get; set; }
         [Parameter] public Func<TItem, TValue> ConvertMethod { get; set; }
         [Parameter] public Func<string, Task<TItem>> AddItemOnEmptyResultMethod { get; set; }
 
@@ -83,9 +86,9 @@ namespace Blazored.Typeahead
 
         protected override void OnInitialized()
         {
-            if (SearchMethod == null)
+            if (SearchMethod == null && SearchMethodWithCancellation == null)
             {
-                throw new InvalidOperationException($"{GetType()} requires a {nameof(SearchMethod)} parameter.");
+                throw new InvalidOperationException($"{GetType()} requires either a {nameof(SearchMethod)} or {nameof(SearchMethodWithCancellation)} parameter.");
             }
 
             if (ConvertMethod == null)
@@ -333,10 +336,42 @@ namespace Blazored.Typeahead
                 IsSearching = true;
                 await InvokeAsync(StateHasChanged);
 
-                Suggestions = (await SearchMethod?.Invoke(_searchText)).Take(MaximumSuggestions).ToArray();
+                try
+                {
+                    // Cancel any ongoing search
+                    if (_searchCancellationTokenSource != null)
+                    {
+                        _searchCancellationTokenSource.Cancel();
+                    }
+                    _searchCancellationTokenSource = new CancellationTokenSource();
 
-                IsSearching = false;
-                await InvokeAsync(StateHasChanged);
+                    Suggestions = (await InvokeSearchMethod(_searchText, _searchCancellationTokenSource.Token)).Take(MaximumSuggestions).ToArray();
+
+                    await InvokeAsync(() =>
+                    {
+                        IsSearching = false;
+                        StateHasChanged();
+                    });
+                }
+                catch (OperationCanceledException)
+                {
+                    // Search was cancelled, don't update UI - ensure we're on UI thread
+                    await InvokeAsync(() =>
+                    {
+                        IsSearching = false;
+                        StateHasChanged();
+                    });
+                }
+                catch (Exception)
+                {
+                    // Handle other exceptions gracefully - ensure we're on UI thread
+                    await InvokeAsync(() =>
+                    {
+                        IsSearching = false;
+                        Suggestions = new TItem[0];
+                        StateHasChanged();
+                    });
+                }
             }
             else
             {
@@ -387,13 +422,47 @@ namespace Blazored.Typeahead
             ShowHelpTemplate = false;
             IsSearching = true;
             await InvokeAsync(StateHasChanged);
-            Suggestions = (await SearchMethod?.Invoke(_searchText)).Take(MaximumSuggestions).ToArray();
+            
+            try
+            {
+                // Cancel any ongoing search
+                if (_searchCancellationTokenSource != null)
+                {
+                    _searchCancellationTokenSource.Cancel();
+                }
+                _searchCancellationTokenSource = new CancellationTokenSource();
 
-            IsSearching = false;
-            IsShowingSuggestions = true;
-            await HookOutsideClick();
-            SelectedIndex = 0;
-            await InvokeAsync(StateHasChanged);
+                Suggestions = (await InvokeSearchMethod(_searchText, _searchCancellationTokenSource.Token)).Take(MaximumSuggestions).ToArray();
+
+                await InvokeAsync(() =>
+                {
+                    IsSearching = false;
+                    IsShowingSuggestions = true;
+                    SelectedIndex = 0;
+                    StateHasChanged();
+                });
+                
+                await HookOutsideClick();
+            }
+            catch (OperationCanceledException)
+            {
+                // Search was cancelled, don't update UI - ensure we're on UI thread
+                await InvokeAsync(() =>
+                {
+                    IsSearching = false;
+                    StateHasChanged();
+                });
+            }
+            catch (Exception)
+            {
+                // Handle other exceptions gracefully - ensure we're on UI thread
+                await InvokeAsync(() =>
+                {
+                    IsSearching = false;
+                    Suggestions = new TItem[0];
+                    StateHasChanged();
+                });
+            }
         }
 
         private async Task HookOutsideClick()
@@ -496,13 +565,32 @@ namespace Blazored.Typeahead
         {
             if (disposing)
             {
-                _debounceTimer.Dispose();
+                _debounceTimer?.Dispose();
+                _searchCancellationTokenSource?.Cancel();
+                _searchCancellationTokenSource?.Dispose();
             }
         }
 
         public async Task Focus()
         {
             await HandleClickOnMask();
+        }
+
+        private async Task<IEnumerable<TItem>> InvokeSearchMethod(string searchText, CancellationToken cancellationToken)
+        {
+            if (SearchMethodWithCancellation != null)
+            {
+                return await SearchMethodWithCancellation(searchText, cancellationToken);
+            }
+            else if (SearchMethod != null)
+            {
+                // For backward compatibility, ignore the cancellation token for the old method
+                return await SearchMethod(searchText);
+            }
+            else
+            {
+                return Enumerable.Empty<TItem>();
+            }
         }
     }
 }

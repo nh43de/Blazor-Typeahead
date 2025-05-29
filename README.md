@@ -4,8 +4,8 @@
 
 Typeahead control for Blazor applications.
 
-[![Nuget version](https://img.shields.io/nuget/v/ModernBlazor.Typeahead.svg?logo=nuget)](https://www.nuget.org/packages/nh43de.Typeahead/)
-[![Nuget downloads](https://img.shields.io/nuget/dt/ModernBlazor.Typeahead?logo=nuget)](https://www.nuget.org/packages/nh43de.Typeahead/)
+[![Nuget version](https://img.shields.io/nuget/v/ModernBlazor.Typeahead.svg?logo=nuget)](https://www.nuget.org/packages/ModernBlazor.Typeahead/)
+[![Nuget downloads](https://img.shields.io/nuget/dt/ModernBlazor.Typeahead?logo=nuget)](https://www.nuget.org/packages/ModernBlazor.Typeahead/)
 ![Build & Test Main](https://github.com/nh43de/Blazor-Typeahead/workflows/Build%20&%20Test%20Main/badge.svg)
 
 ![Screenshot](screenshot.png)
@@ -77,8 +77,8 @@ Below is a list of all the options available on the Typeahead.
 - `StopPropagation` (Optional - Default: `false`) - Control the StopPropagation behavior of the input of this component. See https://docs.microsoft.com/en-us/aspnet/core/blazor/components?view=aspnetcore-3.1#stop-event-propagation
 - `PreventDefault` (Optional - Default: `false`) - Control the PreventDefault behavior of the input of this component. See https://docs.microsoft.com/en-us/aspnet/core/blazor/components?view=aspnetcore-3.1#prevent-default-actions
 
-The control also requires a `SearchMethod` to be provided with the following signature `Task<IEnumerable<TItem>>(string searchText)`. The control will invoke this method 
-passing the text the user has typed into the control. You can then query your data source and return the result as an `IEnumerable` for the control to render.
+The control requires a `SearchMethod` to be provided with the following signature `Task<IEnumerable<TItem>>(string searchText)`. For better performance and to handle search cancellation, you can use `SearchMethodWithCancellation` with the signature `Task<IEnumerable<TItem>>(string searchText, CancellationToken cancellationToken)`. The control will invoke this method 
+passing the text the user has typed into the control. When using `SearchMethodWithCancellation`, previous search operations will be automatically cancelled when new searches are initiated. You can then query your data source and return the result as an `IEnumerable` for the control to render.
 
 If you wish to bind the result of the selection in the control to a different type than the type used in the search this is also possible. For example, if you passed in a list
 of `Person` but when a `Person` was selected you wanted the control to bind to an `int` value which might be the `Id` of the selected `Person`, you can achieve this by providing
@@ -157,6 +157,49 @@ The `SelectedTemplate` is used to display the selected item and the `ResultTempl
 }
 ```
 Because you provide the search method to the component, making a remote call is really straight-forward. In this example, the `Debounce` parameter has been upped to 500ms and the `NotFoundTemplate` has been specified.
+
+### Remote Data Example with Cancellation Token
+
+For better performance when making HTTP requests, especially with fast typing users, you can use the `SearchMethodWithCancellation` parameter to automatically cancel previous requests:
+
+```cs
+@inject HttpClient httpClient
+
+<BlazoredTypeahead SearchMethodWithCancellation="@SearchFilmsWithCancellation"
+                   @bind-Value="@SelectedFilm"
+                   Debounce="500">
+    <SelectedTemplate>
+        @context.Title
+    </SelectedTemplate>
+    <ResultTemplate>
+        @context.Title (@context.Year)
+    </ResultTemplate>
+    <NotFoundTemplate>
+        Sorry, there weren't any search results.
+    </NotFoundTemplate>
+</BlazoredTypeahead>
+
+@code {
+
+    [Parameter] protected IEnumerable<Film> Films { get; set; }
+
+    private async Task<IEnumerable<Film>> SearchFilmsWithCancellation(string searchText, CancellationToken cancellationToken) 
+    {
+        try
+        {
+            var response = await httpClient.GetFromJsonAsync<IEnumerable<Film>>($"https://allfilms.com/api/films/?title={searchText}", cancellationToken);
+            return response ?? Enumerable.Empty<Film>();
+        }
+        catch (OperationCanceledException)
+        {
+            // Request was cancelled, return empty results
+            return Enumerable.Empty<Film>();
+        }
+    }
+
+}
+```
+When using `SearchMethodWithCancellation`, the component will automatically cancel the previous search request when a new search is initiated, improving performance and preventing race conditions.
 
 ### Subscribing to changes in selected values
 It is common to want to be able to know when a value bound to the Typeahead changes. To do this you can't use the standard `@bind-Value` or `@bind-Values` syntax, you must handle the change event manually. To do this you must specify the following parameters:
