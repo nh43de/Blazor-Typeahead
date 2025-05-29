@@ -52,6 +52,17 @@ I would also suggest adding the following using statement to your main `_Imports
 @using ModernBlazor.Typeahead
 ```
 
+### Migration Note
+
+**⚠️ Important for users migrating from Blazored.Typeahead:**
+
+The client assets location has changed in this fork. If you're migrating from the original `Blazored.Typeahead` package, please update your asset references:
+
+- **Previous location**: `_content/Blazored.Typeahead/`
+- **New location**: `_content/ModernBlazor.Typeahead/`
+
+Make sure to update both the CSS and JS references in your `_Host.cshtml` (Blazor Server) or `Index.html` (Blazor WebAssembly) files to use the new `ModernBlazor.Typeahead` path.
+
 ## Usage
 The component can be used standalone or as part of a form. When used in a form the control fully integrates with Blazors forms and authentication system.
 
