@@ -6,7 +6,7 @@ on:
   workflow_dispatch:  # Allow manual triggering
 
 env:
-    PROJECT_NAME: Blazored.Typeahead
+    PROJECT_NAME: ModernBlazor.Typeahead
     NETCORE_VERSION: '9.0.x'
 
 jobs:

@@ -49,8 +49,8 @@ jobs:
       - name: Get version from MinVer
         id: version
         run: |
-          dotnet restore src/Blazored.$PROJECT_NAME/Blazored.$PROJECT_NAME.csproj
-          VERSION=$(dotnet msbuild src/Blazored.$PROJECT_NAME/Blazored.$PROJECT_NAME.csproj -p:Configuration=Release -getProperty:Version)
+          dotnet restore src/ModernBlazor.$PROJECT_NAME/ModernBlazor.$PROJECT_NAME.csproj
+          VERSION=$(dotnet msbuild src/ModernBlazor.$PROJECT_NAME/ModernBlazor.$PROJECT_NAME.csproj -p:Configuration=Release -getProperty:Version)
           echo "Version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
@@ -58,13 +58,13 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build -c Release --no-restore src/Blazored.$PROJECT_NAME/Blazored.$PROJECT_NAME.csproj
+        run: dotnet build -c Release --no-restore src/ModernBlazor.$PROJECT_NAME/ModernBlazor.$PROJECT_NAME.csproj
 
       - name: Test
         run: dotnet test --no-restore --verbosity normal
 
       - name: Pack
-        run: dotnet pack -c Release --no-build --no-restore -o nupkg src/Blazored.$PROJECT_NAME/Blazored.$PROJECT_NAME.csproj
+        run: dotnet pack -c Release --no-build --no-restore -o nupkg src/ModernBlazor.$PROJECT_NAME/ModernBlazor.$PROJECT_NAME.csproj
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
